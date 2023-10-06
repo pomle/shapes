@@ -208,14 +208,14 @@ export function getDevicePreferences() {
 
 - setOf (Set)
 
-  Takes a validator and enforces the value to be a Set of validator type.
+  Takes a validator and coerces the value into a set of the validator type. If the validator produces undefined it will not include undefined in the set.
 
   ```ts
   const validate = record({
-    tags: setOf(string),
+    tags: setOf(either([undefined, "nice", "fast"])),
   });
 
-  validate({ tags: ['nice', 'fast', 'colorful', 'colorful'] }); // Returns {tags: new Set(["nice", "fast", "colorful"])}
+  validate({ tags: ['nice', 'fast', 'colorful', 'colorful'] }); // Returns {tags: new Set(["nice", "fast"])}
   ```
 
 ### Custom validators
