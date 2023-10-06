@@ -75,18 +75,18 @@ export function listOf<T>(cast: (value: unknown) => T) {
   };
 }
 
-export function setOf<T>(cast: (value: unknown) => T) {
+export function setOf<T>(cast: (value: unknown) => T | undefined) {
   return function toSet(value: unknown) {
     const values = new Set<T>();
     if (isIterable(value)) {
       for (const v of value) {
         const casted = cast(v);
         if (casted !== undefined) {
-          values.add(cast(v));
+          values.add(casted);
         }
       }
     }
-    return values as Set<Exclude<T, undefined>>;
+    return values;
   };
 }
 
