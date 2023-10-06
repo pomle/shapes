@@ -192,6 +192,32 @@ export function getDevicePreferences() {
   validate({ language: false }); // Returns {language: "english"}
   ```
 
+- List (Array)
+
+  Takes a validator and enforces the value to be an array of validator type.
+
+  ```ts
+  const validate = record({
+    scores: listOf(number),
+  });
+
+  validate({ scores: ['1', 2] }); // Returns {scores: [2]}
+  validate({ scores: 'italian' }); // Returns {scores: []}
+  validate({ scores: false }); // Returns {scores: []}
+  ```
+
+- setOf (Set)
+
+  Takes a validator and enforces the value to be a Set of validator type.
+
+  ```ts
+  const validate = record({
+    tags: setOf(string),
+  });
+
+  validate({ tags: ['nice', 'fast', 'colorful', 'colorful'] }); // Returns {tags: new Set(["nice", "fast", "colorful"])}
+  ```
+
 ### Custom validators
 
 The only contract for a validator function is that it takes an unknown type, and returns a known type. It should fulfill the [TypeScript Guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) pattern.

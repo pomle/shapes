@@ -8,9 +8,9 @@ export function record<Shape extends Record<string, unknown>>(
   spec: ValidationSpec<Shape>,
 ) {
   return function validate(maybeValues: unknown): Shape {
-    const source = (
-      typeof maybeValues === "object" ? { ...maybeValues } : {}
-    ) as Partial<Shape>;
+    const source = (typeof maybeValues === "object"
+      ? { ...maybeValues }
+      : {}) as Partial<Shape>;
 
     const output: Record<string, unknown> = {};
     for (const name of Object.keys(spec)) {
