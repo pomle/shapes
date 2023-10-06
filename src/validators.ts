@@ -1,3 +1,5 @@
+import { isIterable } from "./guards";
+
 type ValidationEntry<T> = (value: unknown) => T;
 
 type ValidationSpec<Entries extends Record<string, unknown>> = {
@@ -54,18 +56,6 @@ export function number<T extends number | undefined>(initial: T) {
     return initial;
   };
 }
-export function set<T>(itemCheck: (value: unknown) => T) {
-  return function checkSet(values: unknown): T[] {
-    if (Array.isArray(values)) {
-      const out = new Set<T>();
-      for (const value of values) {
-        out.add(itemCheck(value));
-      }
-      return Array.from(out);
-    }
-    return [];
-  };
-}
 
 export function maybe<T>(validate: (value: unknown) => T) {
   return function proxyMaybe(value: unknown): T | undefined {
@@ -85,13 +75,14 @@ export function listOf<T>(cast: (value: unknown) => T) {
   };
 }
 
-export function setOf<T>(valid: Set<T>) {
+export function setOf<T>(cast: (value: unknown) => T) {
   return function toSet(value: unknown) {
     const values = new Set<T>();
-    if (Array.isArray(value)) {
+    if (isIterable(value)) {
       for (const v of value) {
-        if (valid.has(v)) {
-          values.add(v);
+        const casted = cast(v);
+        if (casted !== undefined) {
+          values.add(cast(v));
         }
       }
     }
