@@ -86,7 +86,7 @@ export function setOf<T>(cast: (value: unknown) => T) {
         }
       }
     }
-    return values;
+    return values as Set<Exclude<T, undefined>>;
   };
 }
 
