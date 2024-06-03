@@ -1,18 +1,18 @@
 import { isIterable } from "./guards";
 
-type ValidationEntry<T> = (value: unknown) => T;
+type Validator<T> = (value: unknown) => T;
 
 type ValidationSpec<Entries extends Record<string, unknown>> = {
-  [Name in keyof Entries]: ValidationEntry<Entries[Name]>;
+  [Name in keyof Entries]: Validator<Entries[Name]>;
 };
 
-export function record<Shape extends Record<string, unknown>>(
-  spec: ValidationSpec<Shape>,
-) {
-  return function validate(maybeValues: unknown): Shape {
+export function record<T extends Record<string, unknown>>(
+  spec: ValidationSpec<T>,
+): Validator<T> {
+  return function validate(maybeValues: unknown): T {
     const source = (typeof maybeValues === "object"
       ? { ...maybeValues }
-      : {}) as Partial<Shape>;
+      : {}) as Partial<T>;
 
     const output: Record<string, unknown> = {};
     for (const name of Object.keys(spec)) {
@@ -20,11 +20,11 @@ export function record<Shape extends Record<string, unknown>>(
       output[name] = validate(source[name]);
     }
 
-    return output as Shape;
+    return output as T;
   };
 }
 
-export function either<T>(valid: { 0: T } & readonly T[]) {
+export function either<T>(valid: { 0: T } & readonly T[]): Validator<T> {
   const validEntries = new Set<T>(valid);
   const initial = valid[0];
 
@@ -57,8 +57,10 @@ export function number<T extends number | undefined>(initial: T) {
   };
 }
 
-export function maybe<T>(validate: (value: unknown) => T) {
-  return function proxyMaybe(value: unknown): T | undefined {
+export function maybe<T>(
+  validate: (value: unknown) => T,
+): Validator<T | undefined> {
+  return function proxyMaybe(value: unknown) {
     if (value == null) {
       return undefined;
     }
