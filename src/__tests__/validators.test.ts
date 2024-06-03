@@ -241,6 +241,12 @@ describe("Validation", () => {
         ]);
       });
 
+      it("handles Set", () => {
+        const validate = listOf(number(undefined));
+
+        expect(validate(new Set([1, 2, 3]))).toEqual([1, 2, 3]);
+      });
+
       it("always returns lists", () => {
         const validate = listOf(number(undefined));
 
