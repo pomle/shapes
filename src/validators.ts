@@ -68,6 +68,9 @@ export function maybe<T>(validate: (value: unknown) => T) {
 
 export function listOf<T>(cast: (value: unknown) => T) {
   return function toList(value: unknown) {
+    if (value instanceof Set) {
+      return Array.from(value).map(cast);
+    }
     if (Array.isArray(value)) {
       return value.map(cast);
     }
