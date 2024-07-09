@@ -11,6 +11,8 @@ type Prefs = {
 function getData() {
   try {
     const serializedData = window.localStorage.getItem('user-prefs');
+
+    // Always wrap JSON.parse in try/catch
     return JSON.parse(serializedData);
   } catch (error) {
     return undefined;
