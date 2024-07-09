@@ -39,7 +39,7 @@ This lib is not recommended for user input validation where the user may need fe
 A basic example of a typed insurance pattern.
 
 ```ts
-import { record, number, string } from '@einride/insure';
+import { record, number, string } from '@pomle/shapes';
 
 type Union = 'a' | 'b' | 'c';
 
@@ -67,7 +67,7 @@ const validate = record<Shape>({
 Nested example.
 
 ```ts
-import { record, number, string } from '@einride/insure';
+import { record, number, string } from '@pomle/shapes';
 
 type A = {
   a: number;
@@ -98,7 +98,7 @@ const validate = record({
 Types will be inferred if unspecifed. Some types, like unions, may not behave like you expect unless explicitly defined.
 
 ```ts
-import { record, number, string } from '@einride/insure';
+import { record, number, string } from '@pomle/shapes';
 
 const validate = record({
   a: number(1),
@@ -111,7 +111,7 @@ const data = validate({});
 By validating an empty object you create the default values.
 
 ```ts
-import { record, number, string } from '@einride/insure';
+import { record, number, string } from '@pomle/shapes';
 
 type TimeFormat = 'HH:mm' | 'hh:mm A';
 
@@ -126,7 +126,7 @@ const DEFAULT_VALUES = validate({});
 In most cases you will always pass your data thru the validator function and implicitly get defaults.
 
 ```ts
-import { record, number, string } from "@einride/insure";
+import { record, number, string } from "@pomle/shapes";
 
 type TimeFormat = "HH:mm" | "hh:mm A";
 
