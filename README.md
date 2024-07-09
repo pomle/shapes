@@ -267,3 +267,60 @@ const validator = record({
   defaultId: minLen(16, 'abcdefghijklmnopqrstuvwxyz'),
 });
 ```
+
+### Elaborate example
+
+```ts
+import {
+  record,
+  either,
+  number,
+  string,
+  maybe,
+  listOf,
+} from "@pomle/shapes";
+
+const coords = record({
+  longitude: number(NaN),
+  latitude: number(NaN),
+});
+
+const location = record({
+  coords: maybe(coords),
+});
+
+const name = record({
+  first: string(""),
+  last: string(""),
+});
+
+const street = record({
+  name: string(""),
+  houseNo: string(""),
+  aptNo: string(""),
+});
+
+const address = record({
+  name,
+  street,
+  postcode: string(""),
+  city: string(""),
+});
+
+const customer = record({
+  type: either(["private", "business"] as const),
+  name,
+  addresses: listOf(address),
+  location,
+})
+
+const validate = {
+  name,
+  street,
+  address,
+  location,
+  customer
+};
+
+export { validate };
+```
