@@ -8,10 +8,19 @@ type Prefs = {
   itemsPerPage: number;
 };
 
-const serializedData = window.localStorage.getItem('user-prefs');
+function getData() {
+  try {
+    const serializedData = window.localStorage.getItem('user-prefs');
 
-// May crash application despite behaving like it is typed.
-const unsafe = JSON.parse(serializedData) as Prefs;
+    // Always wrap JSON.parse in try/catch
+    return JSON.parse(serializedData);
+  } catch (error) {
+    return undefined;
+  }
+}
+
+const unsafe = getData() as Prefs;
+// Accessing `unsafe.language` may crash application despite behaving like it is typed.
 
 const validate = record<Prefs>({
   language: either(['english', 'spanish']),
@@ -19,7 +28,8 @@ const validate = record<Prefs>({
 });
 
 // Will ensure that `safe` is compatible with `Prefs` type.
-const safe = validate(JSON.parse(serializedData));
+const safe = validate(unsafe);
+// Accessing `unsafe.language` will be guaranteed to be "english" or "spanish".
 ```
 
 This lib is not recommended for user input validation where the user may need feedback on poorly formed data.
