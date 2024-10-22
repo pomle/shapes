@@ -4,13 +4,13 @@ Library for building validation functions to protect against runtime type errors
 
 ```ts
 type Prefs = {
-  language: 'english' | 'spanish';
+  language: "english" | "spanish";
   itemsPerPage: number;
 };
 
 function getData() {
   try {
-    const serializedData = window.localStorage.getItem('user-prefs');
+    const serializedData = window.localStorage.getItem("user-prefs");
 
     // Always wrap JSON.parse in try/catch
     return JSON.parse(serializedData);
@@ -23,7 +23,7 @@ const unsafe = getData() as Prefs;
 // Accessing `unsafe.language` may crash application despite behaving like it is typed.
 
 const validate = record<Prefs>({
-  language: either(['english', 'spanish']),
+  language: either(["english", "spanish"]),
   itemsPerPage: number(10),
 });
 
@@ -36,91 +36,55 @@ This lib is not recommended for user input validation where the user may need fe
 
 ## Usage
 
-A basic example of a typed insurance pattern.
+A basic example of a shape setup. Types will be inferred if unspecifed. 
 
 ```ts
-import { record, number, string } from '@pomle/shapes';
+import { record, number, string, either } from "@pomle/shapes";
 
-type Union = 'a' | 'b' | 'c';
-
-type Shape = {
-  optionalEither?: Union;
-  requiredEitherAll: Union;
-  requiredEitherSome: Union;
-  optionalString?: string;
-  requiredString: string;
-  optionalNumber?: number;
-  requiredNumber: number;
+type Coords = {
+  lat: number;
+  lon: number;
 };
 
-const validate = record<Shape>({
-  optionalEither: either([undefined]),
-  requiredEitherAll: either(['a', 'b', 'c']),
-  requiredEitherSome: either(['c']),
-  optionalString: string(undefined),
-  requiredString: string('ABCD'),
-  optionalNumber: number(undefined),
-  requiredNumber: number(12345),
-});
-```
+type Language = "english" | "swedish";
 
-Nested example.
-
-```ts
-import { record, number, string } from '@pomle/shapes';
-
-type A = {
-  a: number;
-  b: string;
+type Prefs = {
+  pageSize: number;
+  language: Language;
+  geo: Coords;
+  tag: string;
 };
 
-type B = {
-  c: number;
-  d: string;
+const coords = record<Coords>({
+  lat: number(NaN),
+  lon: number(NaN),
+});
+
+const prefs = record<Prefs>({
+  pageSize: number(25),
+  language: either(["english", "swedish"]),
+  geo: coords,
+  tag: string("Yo!"),
+});
+
+export const validate = {
+  prefs,
 };
-
-const validateA = record<A>({
-  a: number(1),
-  b: string('A'),
-});
-
-const validateB = record<B>({
-  c: number(2),
-  d: string('B'),
-});
-
-const validate = record({
-  a: validateA,
-  b: validateB,
-});
-```
-
-Types will be inferred if unspecifed. Some types, like unions, may not behave like you expect unless explicitly defined.
-
-```ts
-import { record, number, string } from '@pomle/shapes';
-
-const validate = record({
-  a: number(1),
-  b: string('A'),
-});
-
-const data = validate({});
 ```
 
 By validating an empty object you create the default values.
 
 ```ts
-import { record, number, string } from '@pomle/shapes';
+import { record, number, string } from "@pomle/shapes";
 
-type TimeFormat = 'HH:mm' | 'hh:mm A';
+type TimeFormat = "HH:mm" | "hh:mm A";
 
 const validate = record({
   searchHistoryLength: number(100),
-  timeFormat: either<TimeFormat>(['HH:mm', 'hh:mm A']),
+  timeFormat: either<TimeFormat>(["HH:mm", "hh:mm A"]),
 });
 
-const DEFAULT_VALUES = validate({});
+const DEFAULT_VALUES = validate(null);
 ```
 
 In most cases you will always pass your data thru the validator function and implicitly get defaults.
@@ -153,7 +117,7 @@ export function getDevicePreferences() {
 
 ### Value types
 
-- Number
+- `number`
 
   The number validator will only let numbers pass thru.
   No type casting will be attempted.
@@ -164,12 +128,12 @@ export function getDevicePreferences() {
     size: number(1),
   });
 
-  validate({ size: 'foo' }); // Returns {size: 1}
-  validate({ size: '5' }); // Returns {size: 1}
+  validate({ size: "foo" }); // Returns {size: 1}
+  validate({ size: "5" }); // Returns {size: 1}
   validate({ size: 20 }); // Returns {size: 20}
   ```
 
-- String
+- `string`
 
   The string validator will only let strings pass thru.
   No type casting will be attempted.
@@ -180,12 +144,12 @@ export function getDevicePreferences() {
     defaultId: string(undefined),
   });
 
-  validate({ defaultId: 'v8aewbng39' }); // Returns {defaultId: "v8aewbng39"}
-  validate({ defaultId: '5' }); // Returns {defaultId: "5"}
+  validate({ defaultId: "v8aewbng39" }); // Returns {defaultId: "v8aewbng39"}
+  validate({ defaultId: "5" }); // Returns {defaultId: "5"}
   validate({ defaultId: 1234 }); // Returns {defaultId: undefined}
   ```
 
-- Either (one of)
+- `either` (one of)
 
   The either validator will only let values that exist in a set thru.
   No type casting will be attempted.
@@ -194,15 +158,15 @@ export function getDevicePreferences() {
 
   ```ts
   const validate = record({
-    language: either(['english', 'spanish']),
+    language: either(["english", "spanish"]),
   });
 
-  validate({ language: 'spanish' }); // Returns {language: "spanish"}
-  validate({ language: 'italian' }); // Returns {language: "english"}
+  validate({ language: "spanish" }); // Returns {language: "spanish"}
+  validate({ language: "italian" }); // Returns {language: "english"}
   validate({ language: false }); // Returns {language: "english"}
   ```
 
-- List (Array)
+- `listOf` (Array)
 
   Takes a validator and enforces the value to be an array of validator type.
 
@@ -211,12 +175,12 @@ export function getDevicePreferences() {
     scores: listOf(number),
   });
 
-  validate({ scores: ['1', 2] }); // Returns {scores: [2]}
-  validate({ scores: 'italian' }); // Returns {scores: []}
+  validate({ scores: ["1", 2] }); // Returns {scores: [2]}
+  validate({ scores: "italian" }); // Returns {scores: []}
   validate({ scores: false }); // Returns {scores: []}
   ```
 
-- setOf (Set)
+- `setOf` (Set)
 
   Takes a validator and coerces the value into a set of the validator type. If the validator produces undefined it will not include undefined in the set.
 
@@ -225,27 +189,21 @@ export function getDevicePreferences() {
     tags: setOf(either([undefined, "nice", "fast"])),
   });
 
-  validate({ tags: ['nice', 'fast', 'colorful', 'colorful'] }); // Returns {tags: new Set(["nice", "fast"])}
+  validate({ tags: ["nice", "fast", "colorful", "colorful"] }); // Returns {tags: new Set(["nice", "fast"])}
   ```
 
 ### Custom validators
 
-The only contract for a validator function is that it takes an unknown type, and returns a known type. It should fulfill the [TypeScript Guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types) pattern.
+The only contract for a validator function is that it takes an unknown type, and returns a known type.
 
 ```ts
 type ValidationEntry<T> = (value: unknown) => T;
-```
 
-Basic example.
-
-```ts
-function min16Len(value: unknown): string {
-  if (typeof value === 'string') {
-    if (value.length > 15) {
-      return value;
-    }
+function ensureString(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
   }
-  return undefined;
+  return "";
 }
 ```
 
@@ -254,7 +212,7 @@ Validators that require a state can be created using a higher-order function. Th
 ```ts
 function minLen(min: number, fallback: string) {
   return function validate(value: unknown): string {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       if (value.length > min) {
         return value;
       }
@@ -264,21 +222,14 @@ function minLen(min: number, fallback: string) {
 }
 
 const validator = record({
-  defaultId: minLen(16, 'abcdefghijklmnopqrstuvwxyz'),
+  defaultId: minLen(16, "abcdefghijklmnopqrstuvwxyz"),
 });
 ```
 
 ### Elaborate example
 
 ```ts
-import {
-  record,
-  either,
-  number,
-  string,
-  maybe,
-  listOf,
-} from "@pomle/shapes";
+import { record, either, number, string, maybe, listOf } from "@pomle/shapes";
 
 const coords = record({
   longitude: number(NaN),
@@ -312,14 +263,14 @@ const customer = record({
   name,
   addresses: listOf(address),
   location,
-})
+});
 
 const validate = {
   name,
   street,
   address,
   location,
-  customer
+  customer,
 };
 
 export { validate };
