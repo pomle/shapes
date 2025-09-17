@@ -1,6 +1,6 @@
 {
   "name": "@pomle/shapes",
-  "version": "0.1.3",
+  "version": "0.1.4-0",
   "description": "TypeScript library for coalescing unknown data into well defined object shapes.",
   "author": "Pontus Alexander <pontus.alexander@gmail.com>",
   "license": "MIT",
