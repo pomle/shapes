@@ -36,7 +36,7 @@ This lib is not recommended for user input validation where the user may need fe
 
 ## Usage
 
-A basic example of a shape setup. Types will be inferred if unspecifed. 
+A basic example of a shape setup. Types will be inferred if unspecifed.
 
 ```ts
 import { record, number, string, either } from "@pomle/shapes";

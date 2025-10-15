@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { isIterable } from "../guards";
 
 describe("Guards", () => {
